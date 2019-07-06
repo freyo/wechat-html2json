@@ -115,9 +115,9 @@ class RichTextParser
             'type' => 'text',
         ];
 
-        if (is_callable($this->elementNodeHook)) {
+        if (is_callable($this->textNodeHook)) {
             $node = call_user_func_array(
-                $this->elementNodeHook, [$node, $childNode]
+                $this->textNodeHook, [$node, $childNode]
             );
         }
 
