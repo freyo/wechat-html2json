@@ -14,20 +14,41 @@ class RichTextParser
     protected $DOMDocument;
 
     /**
+     * @var callable
+     */
+    protected $elementNodeHook;
+
+    /**
+     * @var callable
+     */
+    protected $textNodeHook;
+
+    /**
      * RichTextParser constructor.
      *
-     * @param $HTML
+     * @param string $HTML
+     * @param null $encoding
      */
-    public function __construct($HTML)
+    public function __construct($HTML, $encoding = null)
     {
         $this->DOMDocument = new \DOMDocument();
         $this->DOMDocument->preserveWhiteSpace = false;
         $this->DOMDocument->strictErrorChecking = false;
-        $this->DOMDocument->loadHTML($this->getXMLEncoding() . $HTML);
+        $this->DOMDocument->loadHTML($this->getXMLEncoding($encoding) . $HTML);
     }
 
     /**
-     * @param $HTML
+     * @param string $encoding
+     *
+     * @return string
+     */
+    protected function getXMLEncoding($encoding = 'utf-8')
+    {
+        return '<?xml encoding="' . $encoding . '" ?>';
+    }
+
+    /**
+     * @param string $HTML
      *
      * @return RichTextParser
      */
@@ -55,14 +76,6 @@ class RichTextParser
     }
 
     /**
-     * @return string
-     */
-    protected function getXMLEncoding()
-    {
-        return '<?xml encoding="utf-8" ?>';
-    }
-
-    /**
      * @param $childNodes
      *
      * @return array
@@ -70,26 +83,14 @@ class RichTextParser
     protected function getNodes($childNodes)
     {
         $nodes = [];
+
         foreach ($childNodes as $childNode) {
             $nodes[] = $this->isTextNode($childNode)
                 ? $this->textNode($childNode)
                 : $this->elementNode($childNode);
         }
-        return $nodes;
-    }
 
-    /**
-     * @param $attributes
-     *
-     * @return array
-     */
-    protected function getAttrs($attributes)
-    {
-        $attrs = [];
-        foreach ($attributes as $attribute) {
-            $attrs[$attribute->name] = $attribute->value;
-        }
-        return $attrs;
+        return array_filter(isset($nodes[0][0]) ? $nodes[0] : $nodes);
     }
 
     /**
@@ -109,10 +110,18 @@ class RichTextParser
      */
     protected function textNode($childNode)
     {
-        return [
+        $node = [
             'text' => $childNode->textContent,
             'type' => 'text',
         ];
+
+        if (is_callable($this->elementNodeHook)) {
+            $node = call_user_func_array(
+                $this->elementNodeHook, [$node, $childNode]
+            );
+        }
+
+        return $node;
     }
 
     /**
@@ -122,7 +131,7 @@ class RichTextParser
      */
     protected function elementNode($childNode)
     {
-        return [
+        $node = [
             'name' => $childNode->nodeName,
             'attrs' => $childNode->attributes
                 ? $this->getAttrs($childNode->attributes)
@@ -131,5 +140,53 @@ class RichTextParser
                 ? $this->getNodes($childNode->childNodes)
                 : [],
         ];
+
+        if (is_callable($this->elementNodeHook)) {
+            $node = call_user_func_array(
+                $this->elementNodeHook, [$node, $childNode]
+            );
+        }
+
+        return $node;
+    }
+
+    /**
+     * @param $attributes
+     *
+     * @return array
+     */
+    protected function getAttrs($attributes)
+    {
+        $attrs = [];
+
+        foreach ($attributes as $attribute) {
+            $attrs[$attribute->name] = $attribute->value;
+        }
+
+        return $attrs;
+    }
+
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function setElementNodeHook(callable $callback)
+    {
+        $this->elementNodeHook = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function setTextNodeHook(callable $callback)
+    {
+        $this->textNodeHook = $callback;
+
+        return $this;
     }
 }
