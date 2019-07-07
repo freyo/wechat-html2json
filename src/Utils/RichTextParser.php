@@ -34,7 +34,7 @@ class RichTextParser
         $this->DOMDocument = new \DOMDocument();
         $this->DOMDocument->preserveWhiteSpace = false;
         $this->DOMDocument->strictErrorChecking = false;
-        $this->DOMDocument->loadHTML($this->getXMLEncoding($encoding) . $HTML);
+        @$this->DOMDocument->loadHTML($this->getXMLEncoding($encoding) . $HTML);
     }
 
     /**
