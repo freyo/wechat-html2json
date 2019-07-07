@@ -1,10 +1,10 @@
 {
-    "name": "freyhsiao/wechat-html2json",
+    "name": "freyo/wechat-html2json",
     "description": "Convert HTML to WeChat Mini Program Rich Text Nodes.",
     "license": "MIT",
     "authors": [
         {
-            "name": "freyhsiao",
+            "name": "freyo",
             "email": "freyhsiao@gmail.com"
         }
     ],
