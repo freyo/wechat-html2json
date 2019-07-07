@@ -1,6 +1,12 @@
 # wechat-html2json
 Convert HTML to WeChat Mini Program Rich Text Nodes
 
+# Install
+
+```
+composer require freyo/wechat-html2json
+```
+
 # Usage
 
 ```php
