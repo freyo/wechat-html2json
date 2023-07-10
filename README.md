@@ -13,7 +13,7 @@ composer require freyo/wechat-html2json
 use Freyo\WeChatMiniProgram\Utils\RichTextParser;
 
 $parsed = RichTextParser::loadHTML($HTML)
-    ->setElementNodeHook(function (array $node, DOMElement $childNode) {
+    ->setElementNodeHook(function (array $node, \DOMNode $childNode) {
         // remove span node
         if ($childNode->nodeName === 'span') {
             return $node['children'];
@@ -29,7 +29,7 @@ $parsed = RichTextParser::loadHTML($HTML)
         }
         return $node;
     })
-    ->setTextNodeHook(function (array $node, DOMElement $childNode) {
+    ->setTextNodeHook(function (array $node, \DOMNode $childNode) {
         // remove text node
         if (strpos($childNode->textContent, 'KeyWord') !== false) {
             return null;
