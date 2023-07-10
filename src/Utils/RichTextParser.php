@@ -78,7 +78,7 @@ class RichTextParser
     /**
      * @return string
      */
-    public function toHTML(): string
+    public function toHTML()
     {
         /** @var \DOMElement $body */
         if ($body = $this->DOMDocument->getElementsByTagName('body')[0]) {
