@@ -22,6 +22,11 @@ $parsed = RichTextParser::loadHTML($HTML)
         if ($childNode->nodeName === 'img') {
             $node['attrs']['width'] = '100%';
         }
+        // modify origin DOMElement
+        // FOR toHTML() ONLY
+        if ($childNode->nodeName === 'a') {
+            $childNode->setAttribute('target', '_blank');
+        }
         return $node;
     })
     ->setTextNodeHook(function (array $node, DOMElement $childNode) {
@@ -35,7 +40,7 @@ $parsed = RichTextParser::loadHTML($HTML)
         );
         return $node;
     })
-    ->toJSON(); // or toArray()
+    ->toJSON(); // or toArray() or toHTML()
     
 var_dump($parsed);
 ```
