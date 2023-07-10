@@ -76,6 +76,19 @@ class RichTextParser
     }
 
     /**
+     * @return string
+     */
+    public function toHTML(): string
+    {
+        /** @var \DOMElement $body */
+        if ($body = $this->DOMDocument->getElementsByTagName('body')[0]) {
+            $this->getNodes($body->childNodes);
+        }
+
+        return $body ? substr($this->DOMDocument->saveHTML($body), 6, -7) : '';
+    }
+
+    /**
      * @param $childNodes
      *
      * @return array
